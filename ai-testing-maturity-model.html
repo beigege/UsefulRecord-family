@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 测试四级成熟度模型</title>
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2035;
+            --bg-card-hover: #212b45;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-violet: #8b5cf6;
+            --border-color: #2d3748;
+            --border-light: #374151;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 55vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, #0a0e1a 0%, #0f172a 50%, #1e1b4b 100%);
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+            animation: drift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(30px, -30px) rotate(5deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 999px;
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.3;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .hero-meta {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta-item {
+            text-align: center;
+        }
+
+        .hero-meta-num {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .hero-meta-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Progress Bar */
+        .progress-bar-section {
+            background: var(--bg-secondary);
+            padding: 3rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .progress-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .progress-track {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-amber), var(--accent-blue), var(--accent-green), var(--accent-violet));
+            border-radius: 2px;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .progress-node {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            background: var(--bg-secondary);
+            padding: 0 0.5rem;
+        }
+
+        .progress-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin: 0 auto 0.6rem;
+            border: 3px solid var(--bg-secondary);
+            box-shadow: 0 0 0 2px currentColor;
+        }
+
+        .progress-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .progress-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 3rem 2rem 6rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 3.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .section-title .icon {
+            font-size: 1.3rem;
+        }
+
+        /* Level Card */
+        .level-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 2.5rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .level-card:hover {
+            border-color: var(--border-light);
+        }
+
+        .level-header {
+            padding: 1.8rem 2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1.2rem;
+            position: relative;
+        }
+
+        .level-header::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .level-card[data-level="0"] .level-header::before { background: var(--accent-amber); }
+        .level-card[data-level="1"] .level-header::before { background: var(--accent-blue); }
+        .level-card[data-level="2"] .level-header::before { background: var(--accent-green); }
+        .level-card[data-level="3"] .level-header::before { background: var(--accent-violet); }
+
+        .level-badge {
+            flex-shrink: 0;
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .level-card[data-level="0"] .level-badge { background: linear-gradient(135deg, #f59e0b, #f97316); }
+        .level-card[data-level="1"] .level-badge { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .level-card[data-level="2"] .level-badge { background: linear-gradient(135deg, #10b981, #059669); }
+        .level-card[data-level="3"] .level-badge { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+        .level-title-group {
+            flex: 1;
+        }
+
+        .level-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .level-tagline {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .level-body {
+            padding: 0 2rem 2rem;
+        }
+
+        .level-body p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .level-body p strong {
+            color: var(--text-primary);
+        }
+
+        .level-body p .keyword {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .info-block {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .info-block-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .level-card[data-level="0"] .info-block-title { color: var(--accent-amber); }
+        .level-card[data-level="1"] .info-block-title { color: var(--accent-blue); }
+        .level-card[data-level="2"] .info-block-title { color: var(--accent-green); }
+        .level-card[data-level="3"] .info-block-title { color: var(--accent-violet); }
+
+        .info-block ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-block ul li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            position: relative;
+            padding-left: 1.3rem;
+        }
+
+        .info-block ul li:last-child {
+            border-bottom: none;
+        }
+
+        .info-block ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.85rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .level-card[data-level="0"] .info-block ul li::before { background: var(--accent-amber); }
+        .level-card[data-level="1"] .info-block ul li::before { background: var(--accent-blue); }
+        .level-card[data-level="2"] .info-block ul li::before { background: var(--accent-green); }
+        .level-card[data-level="3"] .info-block ul li::before { background: var(--accent-violet); }
+
+        .info-block ul li strong {
+            color: var(--text-primary);
+        }
+
+        /* Pipeline Diagram */
+        .pipeline {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1.2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .pipeline-step {
+            flex: 1;
+            min-width: 140px;
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 10px;
+            padding: 0.9rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .pipeline-step-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 0.3rem;
+        }
+
+        .pipeline-step-desc {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .pipeline-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        /* Three-path Diagram */
+        .three-path {
+            display: flex;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .path-item {
+            flex: 1;
+            background: rgba(139, 92, 246, 0.06);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            border-radius: 10px;
+            padding: 0.9rem;
+        }
+
+        .path-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--accent-violet);
+            margin-bottom: 0.3rem;
+        }
+
+        .path-desc {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Priority ladder */
+        .priority-ladder {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin: 1rem 0;
+        }
+
+        .priority-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.6rem 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border-left: 3px solid;
+        }
+
+        .priority-item:nth-child(1) { border-left-color: var(--accent-rose); }
+        .priority-item:nth-child(2) { border-left-color: var(--accent-amber); }
+        .priority-item:nth-child(3) { border-left-color: var(--accent-blue); }
+        .priority-item:nth-child(4) { border-left-color: var(--accent-violet); }
+
+        .priority-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .priority-item:nth-child(1) .priority-tag { background: rgba(244,63,94,0.15); color: var(--accent-rose); }
+        .priority-item:nth-child(2) .priority-tag { background: rgba(245,158,11,0.15); color: var(--accent-amber); }
+        .priority-item:nth-child(3) .priority-tag { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .priority-item:nth-child(4) .priority-tag { background: rgba(139,92,246,0.15); color: var(--accent-violet); }
+
+        .priority-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Feedback loop diagram */
+        .feedback-loop {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .loop-node {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
+            padding: 0.7rem 1.2rem;
+            text-align: center;
+        }
+
+        .loop-node-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .loop-node-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+
+        .loop-arrow {
+            color: var(--accent-green);
+            font-size: 1.3rem;
+        }
+
+        /* Metrics grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .metric-item {
+            background: rgba(16, 185, 129, 0.06);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            border-radius: 10px;
+            padding: 0.9rem 1.1rem;
+        }
+
+        .metric-name {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 0.2rem;
+        }
+
+        .metric-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Transition card */
+        .transition-card {
+            background: linear-gradient(135deg, rgba(59,130,246,0.05), rgba(139,92,246,0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.5rem 1.8rem;
+            margin: 1.5rem 0;
+        }
+
+        .transition-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .transition-arrow-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.2rem 0.7rem;
+            border-radius: 6px;
+            background: rgba(59,130,246,0.15);
+            color: var(--accent-blue);
+        }
+
+        .transition-body {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .transition-body strong {
+            color: var(--text-primary);
+        }
+
+        .transition-body .keyword {
+            color: var(--accent-cyan);
+        }
+
+        /* MVP table */
+        .mvp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+        }
+
+        .mvp-table th {
+            text-align: left;
+            padding: 0.7rem 1rem;
+            background: rgba(59,130,246,0.1);
+            color: var(--accent-blue);
+            font-weight: 700;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .mvp-table td {
+            padding: 0.7rem 1rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mvp-table td:first-child {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .mvp-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* Industry benchmark */
+        .benchmark-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .benchmark-item {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .benchmark-item:last-child {
+            border-bottom: none;
+        }
+
+        .benchmark-source {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 0.3rem;
+        }
+
+        .benchmark-text {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Summary Diagram */
+        .summary-diagram {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-cell {
+            flex: 1;
+            padding: 1rem 0.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .summary-cell.l0 { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); }
+        .summary-cell.l1 { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); }
+        .summary-cell.l2 { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); }
+        .summary-cell.l3 { background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2); }
+
+        .summary-level-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .summary-cell.l0 .summary-level-name { color: var(--accent-amber); }
+        .summary-cell.l1 .summary-level-name { color: var(--accent-blue); }
+        .summary-cell.l2 .summary-level-name { color: var(--accent-green); }
+        .summary-cell.l3 .summary-level-name { color: var(--accent-violet); }
+
+        .summary-level-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .summary-arrow {
+            display: flex;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .summary-quote {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .summary-quote .keyword {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pipeline-step { min-width: 100%; }
+            .pipeline-arrow { transform: rotate(90deg); }
+            .three-path { flex-direction: column; }
+            .metrics-grid { grid-template-columns: 1fr; }
+            .summary-row { flex-direction: column; }
+            .summary-arrow { transform: rotate(90deg); justify-content: center; }
+            .feedback-loop { flex-direction: column; }
+            .loop-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">AI TESTING MATURITY MODEL</div>
+        <h1>AI 测试四级成熟度模型</h1>
+        <p class="hero-subtitle">
+            从"人用 AI"到"AI 自治"的渐进演进路径<br>
+            描述 AI 测试落地的四个阶段：手工探索 → 流水线雏形 → 数据驱动 → 自治智能
+        </p>
+        <div class="hero-meta">
+            <div class="hero-meta-item">
+                <div class="hero-meta-num">4</div>
+                <div class="hero-meta-label">成熟度级别</div>
+            </div>
+            <div class="hero-meta-item">
+                <div class="hero-meta-num">L1→L2</div>
+                <div class="hero-meta-label">当前所处阶段</div>
+            </div>
+            <div class="hero-meta-item">
+                <div class="hero-meta-num">4</div>
+                <div class="hero-meta-label">核心演进维度</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Progress Bar -->
+<section class="progress-bar-section">
+    <div class="progress-container">
+        <div class="progress-track">
+            <div class="progress-line"></div>
+            <div class="progress-node">
+                <div class="progress-dot" style="background:var(--accent-amber); color:var(--accent-amber);"></div>
+                <div class="progress-label" style="color:var(--accent-amber);">Level 0</div>
+                <div class="progress-sub">手工探索</div>
+            </div>
+            <div class="progress-node">
+                <div class="progress-dot" style="background:var(--accent-blue); color:var(--accent-blue);"></div>
+                <div class="progress-label" style="color:var(--accent-blue);">Level 1</div>
+                <div class="progress-sub">流水线雏形</div>
+            </div>
+            <div class="progress-node">
+                <div class="progress-dot" style="background:var(--accent-green); color:var(--accent-green);"></div>
+                <div class="progress-label" style="color:var(--accent-green);">Level 2</div>
+                <div class="progress-sub">数据驱动</div>
+            </div>
+            <div class="progress-node">
+                <div class="progress-dot" style="background:var(--accent-violet); color:var(--accent-violet);"></div>
+                <div class="progress-label" style="color:var(--accent-violet);">Level 3</div>
+                <div class="progress-sub">自治智能</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<div class="main-content">
+
+    <!-- Overview -->
+    <div class="section">
+        <h2 class="section-title"><span class="icon">📋</span> 模型总览</h2>
+        <p>
+            AI 测试不是一步到位的"魔法"，而是一个从"人用 AI"到"AI 自治"的渐进演进过程。四个级别的本质区别在于：<strong>AI 在测试流程中的角色从"工具"逐步升级为"智能体"，从"被动响应"逐步进化为"主动自优化"</strong>。
+        </p>
+        <p>
+            每个级别的跃升，核心是回答一个问题：<span class="keyword" style="color:var(--accent-cyan);">谁来驱动优化</span>——是人来驱动 AI，还是 AI 自己驱动自己。随着级别提升，人从"操作者"逐步退后为"监督者和决策者"。
+        </p>
+    </div>
+
+    <!-- Level 0 -->
+    <div class="level-card" data-level="0">
+        <div class="level-header">
+            <div class="level-badge">L0</div>
+            <div class="level-title-group">
+                <div class="level-title">Level 0：手工探索期</div>
+                <div class="level-tagline">"每个人都在用，但没人管"</div>
+            </div>
+        </div>
+        <div class="level-body">
+            <p>
+                <strong>核心特征：</strong>测试同学以个人为单位，自发使用 ChatGPT、Claude 等通用大模型辅助测试工作。没有统一标准、没有流程约束、没有质量保障。
+            </p>
+            <p>
+                <strong>典型场景：</strong>某个测试同学在写用例前，把需求文档丢给 ChatGPT，让它帮忙列一些测试点；或者拿一段代码让 AI 帮忙分析逻辑。效果好不好完全取决于个人的 Prompt 技巧和对 AI 能力边界的理解。
+            </p>
+
+            <div class="info-block">
+                <div class="info-block-title">⚠️ 存在的问题</div>
+                <ul>
+                    <li><strong>质量不可控</strong>：同一段需求，不同人用不同 Prompt 生成的用例质量差异巨大，没有基线对比</li>
+                    <li><strong>知识不沉淀</strong>：每个人摸索出的好 Prompt、好实践都留在个人手里，团队换人就归零</li>
+                    <li><strong>无法度量</strong>：AI 到底有没有帮助？帮了多少？没有任何数据支撑，管理层看不到 ROI</li>
+                    <li><strong>安全隐患</strong>：把业务文档、代码直接丢给外部 AI 工具，存在数据泄露风险</li>
+                </ul>
+            </div>
+
+            <p>
+                <strong>这个阶段的价值：</strong>虽然问题多，但 Level 0 是不可跳过的。它让团队"先尝到甜头"，建立对 AI 测试的基本认知和信心。关键是<span class="keyword">不能停留在这一步</span>。
+            </p>
+        </div>
+    </div>
+
+    <!-- Level 1 -->
+    <div class="level-card" data-level="1">
+        <div class="level-header">
+            <div class="level-badge">L1</div>
+            <div class="level-title-group">
+                <div class="level-title">Level 1：流水线雏形期</div>
+                <div class="level-tagline">"有了流水线，但每步都是孤岛" · 当前所处阶段</div>
+            </div>
+        </div>
+        <div class="level-body">
+            <p>
+                <strong>核心特征：</strong>AI 测试能力被集成为多阶段流水线（Pipeline），有明确的阶段划分和输入输出约束，但各阶段之间是"松耦合"的独立步骤，<span class="keyword">缺乏整体优化和反馈机制</span>。
+            </p>
+
+            <div class="info-block">
+                <div class="info-block-title">⚙️ 典型流水线架构（以用例生成 Agent 为例）</div>
+                <p style="font-size:0.88rem; color:var(--text-secondary); margin-bottom:0.8rem;">
+                    整个流程分为四个阶段，形成一条完整的用例生成流水线：
+                </p>
+
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-title">Phase 0</div>
+                        <div class="pipeline-step-desc">文档解析与<br>功能点提取</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-title">Phase 1</div>
+                        <div class="pipeline-step-desc">三路并行<br>上下文补充</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-title">Phase 2</div>
+                        <div class="pipeline-step-desc">分层用例<br>生成</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-title">Phase 3</div>
+                        <div class="pipeline-step-desc">质检去重与<br>结构化交付</div>
+                    </div>
+                </div>
+
+                <p style="font-size:0.86rem; color:var(--text-secondary); margin-top:0.8rem;">
+                    <strong style="color:var(--text-primary);">Phase 0 · 文档解析</strong>：通过"动词+obj"格式从需求文档中提取功能点（FP），扫描 Lion/MQ/Cache/Crane 等关键词建立中间件映射。采用 18 类信号扫描（文本 10 类、图表 5 类、结构 3 类）系统化提取信息，防止遗漏。每个功能点满足"原子性"——最小不可再分的功能单元。
+                </p>
+
+                <p style="font-size:0.86rem; color:var(--text-secondary); margin-top:0.6rem;">
+                    <strong style="color:var(--text-primary);">Phase 1 · 三路并行</strong>：采用三路并行架构，互不阻塞，任何一路超时（300s）即降级跳过。
+                </p>
+
+                <div class="three-path">
+                    <div class="path-item">
+                        <div class="path-label">A 路 · 知识图谱</div>
+                        <div class="path-desc">从已有知识图谱中检索与当前功能点相关的测试点和领域知识</div>
+                    </div>
+                    <div class="path-item">
+                        <div class="path-label">B 路 · 专家经验</div>
+                        <div class="path-desc">拉取经验知识库中的规则约束（experienceFlag=0 纯经验数据）</div>
+                    </div>
+                    <div class="path-item">
+                        <div class="path-label">C 路 · 历史用例</div>
+                        <div class="path-desc">从团队沉淀的历史用例库中检索相似场景的参考用例</div>
+                    </div>
+                </div>
+
+                <p style="font-size:0.86rem; color:var(--text-secondary); margin-top:0.6rem;">
+                    <strong style="color:var(--text-primary);">Phase 2 · 用例生成</strong>：按优先级分层生成，产出标准 9 列用例格式。采用变更类型三分法（New/Enhanced/Config）精确控制中间件测试点生成粒度。
+                </p>
+
+                <div class="priority-ladder">
+                    <div class="priority-item">
+                        <span class="priority-tag">P0</span>
+                        <span class="priority-text">主路径 — 核心功能正向流程</span>
+                    </div>
+                    <div class="priority-item">
+                        <span class="priority-tag">P1</span>
+                        <span class="priority-text">边界与幂等性</span>
+                    </div>
+                    <div class="priority-item">
+                        <span class="priority-tag">P2</span>
+                        <span class="priority-text">降级与补偿</span>
+                    </div>
+                    <div class="priority-item">
+                        <span class="priority-tag">P3</span>
+                        <span class="priority-text">极端场景</span>
+                    </div>
+                </div>
+
+                <p style="font-size:0.86rem; color:var(--text-secondary); margin-top:0.6rem;">
+                    <strong style="color:var(--text-primary);">Phase 3 · 质检交付</strong>：执行两层质检——第一层检查 P0 功能点覆盖率；第二层用 testcase-dedup-checker 做场景级语义去重。验证 9 列完整性与预期结果可验证性。最终通过 citadel 写入学城目录，后置数据上报异步执行。
+                </p>
+            </div>
+
+            <div class="info-block">
+                <div class="info-block-title">🔴 Level 1 的关键问题</div>
+                <ul>
+                    <li><strong>流水线没有"学习能力"</strong>：Phase 2 生成用例时不知道 Phase 1 检索质量如何，Phase 3 的质检结果不会反馈给 Phase 2 改进。跑一千次都用同样的逻辑</li>
+                    <li><strong>Prompt 约束不够严格</strong>：用例质量波动大，缺乏版本管理和 AB 测试机制</li>
+                    <li><strong>用例去重依赖人工</strong>：未实现自动 Embedding 相似度计算和去重</li>
+                    <li><strong>领域知识不可复用</strong>：不同项目的知识没有形成可复用的知识库</li>
+                    <li><strong>中间产物不可追溯</strong>：流水线的中间步骤产出无法回溯和审计</li>
+                </ul>
+            </div>
+
+            <div class="transition-card">
+                <div class="transition-title">
+                    <span class="transition-arrow-badge">L1 → L2</span>
+                    过渡期关键建设项
+                </div>
+                <div class="transition-body">
+                    <p style="margin-bottom:0.8rem;">
+                        <strong>1. 引入 Embedding 去重和 Step 1.5 质检层</strong>：在 Phase 1 和 Phase 2 之间增加一层质检，用向量相似度自动识别和合并重复用例，不再等到 Phase 3 人工处理。
+                    </p>
+                    <p style="margin-bottom:0.8rem;">
+                        <strong>2. 建立 Prompt 版本管理和 AB 测试机制</strong>：不同版本 Prompt 生成的用例质量可以量化对比，持续迭代优化。
+                    </p>
+                    <p>
+                        <strong>3. 统一用例数据格式和接口规范</strong>：为后续数据反馈闭环打好基础——如果用例格式不统一，就无法做自动化的质量分析和反馈。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level 2 -->
+    <div class="level-card" data-level="2">
+        <div class="level-header">
+            <div class="level-badge">L2</div>
+            <div class="level-title-group">
+                <div class="level-title">Level 2：数据驱动期</div>
+                <div class="level-tagline">"流水线会从执行结果中学习"</div>
+            </div>
+        </div>
+        <div class="level-body">
+            <p>
+                <strong>核心特征：</strong>流水线不再是"静态"的，而是建立了<span class="keyword">执行信号反馈闭环</span>。用例生成后真正执行的结果会回流到生成阶段，驱动模型和策略的持续自优化。
+            </p>
+
+            <div class="info-block">
+                <div class="info-block-title">🔄 核心能力 — 反馈闭环</div>
+                <p style="font-size:0.88rem; color:var(--text-secondary); margin-bottom:0.8rem;">
+                    AI 生成了 100 条用例，测试同学审核后执行了 60 条：
+                </p>
+                <div class="feedback-loop">
+                    <div class="loop-node">
+                        <div class="loop-node-title">用例生成</div>
+                        <div class="loop-node-desc">100 条用例</div>
+                    </div>
+                    <div class="loop-arrow">→</div>
+                    <div class="loop-node">
+                        <div class="loop-node-title">执行 & 评审</div>
+                        <div class="loop-node-desc">60 条执行</div>
+                    </div>
+                    <div class="loop-arrow">→</div>
+                    <div class="loop-node">
+                        <div class="loop-node-title">信号采集</div>
+                        <div class="loop-node-desc">5 条抓 bug / 10 条有误 / 30 条低价值</div>
+                    </div>
+                    <div class="loop-arrow">↺</div>
+                    <div class="loop-node">
+                        <div class="loop-node-title">策略自优化</div>
+                        <div class="loop-node-desc">低价值模式降权<br>抓 bug 模式增强</div>
+                    </div>
+                </div>
+                <p style="font-size:0.86rem; color:var(--text-secondary); margin-top:0.5rem;">
+                    执行信号回流到用例生成 Agent："低价值"用例的 Prompt 模式被<span class="keyword">降权</span>，"发现缺陷"的模式被<span class="keyword">增强</span>，"用例本身有问题"的类型加入<span class="keyword">黑名单</span>。
+                </p>
+            </div>
+
+            <div class="info-block">
+                <div class="info-block-title">🏗️ 需要的基础设施</div>
+                <ul>
+                    <li><strong>数据采集层</strong>：统一记录每条用例的执行结果、缺陷关联、审核意见，形成结构化的用例质量数据集</li>
+                    <li><strong>信号分析层</strong>：对采集数据做统计分析，识别"哪些类型用例质量高""哪些 Prompt 模式产出低价值用例""哪些功能点覆盖经常遗漏"</li>
+                    <li><strong>反馈应用层</strong>：将分析结论自动转化为生成策略调整 — Prompt 权重调整、知识图谱节点更新、历史用例优先级重排</li>
+                </ul>
+            </div>
+
+            <div class="info-block">
+                <div class="info-block-title">📊 关键指标体系转变</div>
+                <p style="font-size:0.86rem; color:var(--text-secondary); margin-bottom:0.6rem;">
+                    成功指标不再是"生成了多少用例"或"用例数量减少了多少"，而是聚焦四个核心指标：
+                </p>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-name">缺陷逃逸率</div>
+                        <div class="metric-desc">线上缺陷是否下降或持平，最核心的质量指标</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-name">用例有效性</div>
+                        <div class="metric-desc">过去半年抓到 bug 的用例占比，衡量用例实际价值</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-name">回归效率</div>
+                        <div class="metric-desc">全量执行时间是否缩短，衡量回归测试投入产出</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-name">测试设计人效</div>
+                        <div class="metric-desc">用例编写耗时是否降低，衡量设计环节的效率提升</div>
+                    </div>
+                </div>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:0.5rem; font-style:italic;">
+                    核心逻辑：如果用例量减半但缺陷逃逸率上升，说明优化方向是错的。
+                </p>
+            </div>
+
+            <div class="info-block">
+                <div class="info-block-title">✅ 组织阻力的缓解</div>
+                <ul>
+                    <li><strong>对执行层</strong>：有了数据反馈可以证明"AI 处理重复劳动，人专注探索性测试"，保留人工否决权</li>
+                    <li><strong>对管理层</strong>：A/B 实验数据能说话（用例量降 40%+ 审核时间从 3 天降至半天）</li>
+                    <li><strong>对研发层</strong>：Pipeline 输出可以稳定对接自动化框架，价值可量化</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level 3 -->
+    <div class="level-card" data-level="3">
+        <div class="level-header">
+            <div class="level-badge">L3</div>
+            <div class="level-title-group">
+                <div class="level-title">Level 3：自治智能期</div>
+                <div class="level-tagline">"Agent 自己决定怎么测"</div>
+            </div>
+        </div>
+        <div class="level-body">
+            <p>
+                <strong>核心特征：</strong>不再需要人工配置 Prompt 策略、选择知识源、设定生成优先级。Agent 能够<span class="keyword">根据项目特性自适应调整整个测试策略</span>——包括决定测什么、不测什么、用什么方式测、测到什么程度。
+            </p>
+
+            <div class="info-block">
+                <div class="info-block-title">⚡ 与 Level 2 的本质区别</div>
+                <ul>
+                    <li><strong>Level 2 是"被动优化"</strong>：人分析数据，人调整策略，AI 只是执行</li>
+                    <li><strong>Level 3 是"主动自治"</strong>：Agent 自己分析反馈数据，自己调整策略，甚至自己决定是否需要补充新的知识源</li>
+                </ul>
+            </div>
+
+            <div class="info-block">
+                <div class="info-block-title">🤖 典型场景</div>
+                <p style="font-size:0.88rem; color:var(--text-secondary); margin-bottom:0.6rem;">
+                    一个新需求进来后，Level 3 的 Agent 会自动完成以下全部工作：
+                </p>
+                <ul>
+                    <li>分析需求的变更类型和影响范围，自动判断需要走哪些测试路径</li>
+                    <li>根据该项目历史缺陷数据，自动调整测试优先级（如该项目幂等性问题多，自动加重幂等测试）</li>
+                    <li>自动选择最合适的知识源（不需要人配置走 A 路还是 B 路）</li>
+                    <li>发现现有知识不够时，主动触发知识补充流程</li>
+                    <li>生成用例后自动评估质量，不达标的部分自主重新生成</li>
+                    <li>把执行结果和缺陷信息自动关联到知识图谱，持续丰富团队知识资产</li>
+                </ul>
+            </div>
+
+            <div class="info-block">
+                <div class="info-block-title">🔧 技术前提</div>
+                <ul>
+                    <li><strong>Agent 自主决策能力</strong>：Orchestrator Pattern 的成熟形态，子 Agent 不仅能并行执行，还能自主编排</li>
+                    <li><strong>知识图谱自演化能力</strong>：不需要人工维护，自动从执行数据中学习和更新</li>
+                    <li><strong>多模态理解能力</strong>：不仅理解文本需求，还能理解 UI 设计稿、接口定义、代码变更等多种输入</li>
+                </ul>
+            </div>
+
+            <div class="benchmark-card">
+                <div class="info-block-title" style="color:var(--accent-violet);">🌐 行业对标</div>
+                <div class="benchmark-item">
+                    <div class="benchmark-source">Gartner · Hype Cycle for AI in Software Engineering, 2024</div>
+                    <div class="benchmark-text">将 AI-Augmented Testing 放在快速上升期，预测到 2027 年将有 80% 的测试团队采用 AI 增强测试</div>
+                </div>
+                <div class="benchmark-item">
+                    <div class="benchmark-source">Forrester · The Future Of Software Testing Is Autonomous</div>
+                    <div class="benchmark-text">明确提出测试的未来是"自治"（Autonomous）方向</div>
+                </div>
+                <div class="benchmark-item">
+                    <div class="benchmark-source">行业实践现状</div>
+                    <div class="benchmark-text">阿里、字节、百度、腾讯等大厂的 AI 测试平台也大多处于 Level 1-2 之间，真正达到 Level 3 的几乎没有。Level 3 是一个前瞻性目标，不是短期可实现的。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evolution Path -->
+    <div class="section">
+        <h2 class="section-title"><span class="icon">🗺️</span> 演进路径实践建议</h2>
+
+        <div class="transition-card">
+            <div class="transition-title">
+                <span class="transition-arrow-badge">L0 → L1</span>
+                把个人经验沉淀为团队流水线
+            </div>
+            <div class="transition-body">
+                <p style="margin-bottom:0.6rem;">
+                    遵循<span class="keyword">"先跑通闭环再工程化"</span>原则，分四步走：
+                </p>
+                <p style="margin-bottom:0.4rem;"><strong>Phase 0 · 建立基线</strong>：统计 3 个已上线需求的手工用例数、耗时、缺陷情况</p>
+                <p style="margin-bottom:0.4rem;"><strong>Phase 1 · 单点验证</strong>：回溯生成用例，与手工用例对比质量</p>
+                <p style="margin-bottom:0.4rem;"><strong>Phase 2 · 小范围试点</strong>：选 1 个项目组真实运行</p>
+                <p style="margin-bottom:0.8rem;"><strong>Phase 3 · 逐步推广</strong>：跑通后扩展到更多项目</p>
+                <p style="font-size:0.85rem; color:var(--text-muted);">最小可行方案仅为"一个优化 Prompt + 人工审核环节"，避免过早引入复杂架构。</p>
+            </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+            <table class="mvp-table">
+                <thead>
+                    <tr>
+                        <th>团队阶段</th>
+                        <th>MVP 策略</th>
+                        <th>投入</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>初创团队</td>
+                        <td>仅需 Step 2 Prompt 约束</td>
+                        <td>半天</td>
+                    </tr>
+                    <tr>
+                        <td>成熟团队</td>
+                        <td>加 Embedding 去重 + Step 1.5 质检</td>
+                        <td>1 周</td>
+                    </tr>
+                    <tr>
+                        <td>大型团队</td>
+                        <td>全套改造 + 反馈闭环</td>
+                        <td>3-4 周</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="transition-card">
+            <div class="transition-title">
+                <span class="transition-arrow-badge" style="background:rgba(16,185,129,0.15); color:var(--accent-green);">L1 → L2</span>
+                建立数据反馈闭环（当前最关键）
+            </div>
+            <div class="transition-body">
+                <p style="margin-bottom:0.6rem;">
+                    <strong>1. 统一用例数据格式</strong>：让执行结果可采集、可分析</p>
+                <p style="margin-bottom:0.6rem;">
+                    <strong>2. 建立用例质量指标体系</strong>：缺陷逃逸率、用例有效性、回归效率、测试设计人效
+                </p>
+                <p>
+                    <strong>3. 在流水线中增加反馈接入点</strong>：让执行信号能回流到生成阶段
+                </p>
+            </div>
+        </div>
+
+        <div class="transition-card">
+            <div class="transition-title">
+                <span class="transition-arrow-badge" style="background:rgba(139,92,246,0.15); color:var(--accent-violet);">L2 → L3</span>
+                从被动优化到主动自治（长期目标）
+            </div>
+            <div class="transition-body">
+                <p style="margin-bottom:0.6rem;">
+                    这一步跨度最大，技术上依赖 Agent 自主决策和知识图谱自演化的成熟。建议作为长期目标，在 Level 2 建设过程中有意识地<span class="keyword">预留扩展点</span>：
+                </p>
+                <p style="margin-bottom:0.3rem;">• 知识图谱的更新接口预留</p>
+                <p style="margin-bottom:0.3rem;">• Agent 编排的可配置化</p>
+                <p>• 多模态输入的接入预留</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Diagram -->
+    <div class="section">
+        <h2 class="section-title"><span class="icon">🎯</span> 一图总结</h2>
+        <div class="summary-diagram">
+            <div class="summary-row">
+                <div class="summary-cell l0">
+                    <div class="summary-level-name">Level 0</div>
+                    <div class="summary-level-desc">手工探索<br><br>个人用 AI<br>无标准<br><br>"尝到甜头"</div>
+                </div>
+                <div class="summary-arrow">→</div>
+                <div class="summary-cell l1">
+                    <div class="summary-level-name">Level 1</div>
+                    <div class="summary-level-desc">流水线雏形<br><br>团队流水线<br>各步独立<br><br>"有了流程"</div>
+                </div>
+                <div class="summary-arrow">→</div>
+                <div class="summary-cell l2">
+                    <div class="summary-level-name">Level 2</div>
+                    <div class="summary-level-desc">数据驱动<br><br>反馈闭环<br>持续自优化<br><br>"会学习"</div>
+                </div>
+                <div class="summary-arrow">→</div>
+                <div class="summary-cell l3">
+                    <div class="summary-level-name">Level 3</div>
+                    <div class="summary-level-desc">自治智能<br><br>Agent 自治<br>自适应调整<br><br>"自己干"</div>
+                </div>
+            </div>
+            <div class="summary-quote">
+                每个级别的跃升，本质上是<span class="keyword">从"人驱动 AI"逐步走向"AI 驱动 AI"</span>，人从"操作者"逐步退后为"监督者和决策者"。
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    AI 测试四级成熟度模型 · 业务测试团队内部参考文档<br>
+    当前阶段：Level 1 → Level 2 过渡期
+</div>
+
+</body>
+</html>
