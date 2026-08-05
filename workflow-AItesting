@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>AI 主导软件交付流程及关键活动（角色融合后）</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+    background: #fff;
+    margin: 0;
+    padding: 28px 24px 40px;
+    color: #222;
+  }
+  h1 {
+    text-align: center;
+    font-size: 21px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    letter-spacing: .5px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 12.5px;
+    color: #888;
+    margin-bottom: 20px;
+  }
+
+  .chart { border: 2px solid #333; min-width: 1740px; }
+  table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+
+  .side {
+    width: 34px;
+    background: #fff;
+    border-right: 1.5px solid #333;
+    text-align: center;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    padding: 10px 0;
+  }
+
+  /* 角色列（可跨行） */
+  .rolecol {
+    width: 34px;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    border-right: 1.5px solid #333;
+    padding: 8px 0;
+  }
+  /* 活动性质子列 */
+  .subcol {
+    width: 74px;
+    text-align: center;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    border-right: 1.5px solid #333;
+    padding: 8px 5px;
+  }
+
+  .phasehead td { border-bottom: 1.5px solid #333; padding: 5px 4px; background:#fff; }
+  .arrow {
+    background: #fff;
+    border: 1.3px solid #444;
+    height: 27px;
+    line-height: 25px;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 600;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%);
+    padding-right: 12px;
+  }
+
+  .corner {
+    background: #f2f2f2;
+    border-right: 1.5px solid #333;
+    border-bottom: 1.5px solid #333;
+    font-size: 11.5px;
+    position: relative;
+    height: 38px;
+  }
+  .corner .p { position:absolute; top:4px; right:7px; font-weight:600; }
+  .corner .r { position:absolute; bottom:4px; left:7px; font-weight:600; }
+  .corner::after {
+    content:''; position:absolute; top:0; left:0; width:100%; height:100%;
+    background: linear-gradient(to top right, transparent calc(50% - .7px), #999 50%, transparent calc(50% + .7px));
+  }
+
+  td.cell { padding: 9px 6px; vertical-align: middle; }
+  .band { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+
+  .act {
+    border: 1.2px solid #555;
+    background: #fff;
+    font-size: 11.5px;
+    padding: 5px 9px;
+    white-space: nowrap;
+    line-height: 1.35;
+    text-align: center;
+  }
+  .ai   { background:#e3f0ff; border-color:#4a86c5; color:#14395c; font-weight:600; }
+  .gate { background:#ffd9d9; border-color:#c0392b; color:#7b241c; font-weight:600; }
+  .gone { background:#e2f3e2; border-color:#4a9d4a; color:#1e5c1e; }
+  .fade { background:#fafafa; border:1.2px dashed #c4c4c4; color:#999; }
+
+  /* 泳道底色 */
+  .lane-pm   td.cell { background:#fff; }
+  .lane-ai   td.cell { background:#f2f8ff; }
+  .lane-gate td.cell { background:#fffaf0; }
+  .lane-exec td.cell { background:#fcfcfc; }
+
+  tr.hard td, tr.hard th { border-top: 1.5px solid #333; }
+  tr.soft td { border-top: 1px dashed #bbb; }
+  .vsep { border-left: 1px solid #e0e0e0; }
+
+  .legend { display:flex; justify-content:center; gap:14px; margin-top:22px; flex-wrap:wrap; }
+  .lg { font-size:11.5px; padding:7px 15px; border:1.2px solid #555; text-align:center; }
+
+  .note {
+    max-width: 1180px; margin: 26px auto 0; font-size: 12.5px;
+    color: #555; line-height: 1.85; border-top: 1px solid #e5e5e5; padding-top: 16px;
+  }
+  .note b { color:#222; }
+  .note p { margin: 0 0 14px; }
+</style>
+</head>
+<body>
+
+<h1>AI 主导软件交付流程及关键活动（角色融合后）</h1>
+<div class="subtitle">前端 · 后端 · QA 融合为全栈工程师 &nbsp;|&nbsp; AI Agent 独立泳道 &nbsp;|&nbsp; 人工活动按决策 / 执行分层 &nbsp;|&nbsp; 测试活动两段式左移</div>
+
+<div class="chart">
+<table>
+  <colgroup>
+    <col style="width:34px">
+    <col style="width:34px">
+    <col style="width:74px">
+    <col style="width:12%">
+    <col style="width:25.5%">
+    <col style="width:25.5%">
+    <col style="width:13%">
+    <col style="width:13%">
+  </colgroup>
+
+  <!-- 阶段头 -->
+  <tr class="phasehead">
+    <td class="corner" colspan="3"><span class="p">阶段</span><span class="r">角色</span></td>
+    <td><div class="arrow">需求阶段</div></td>
+    <td><div class="arrow">开发阶段</div></td>
+    <td><div class="arrow">测试阶段</div></td>
+    <td><div class="arrow">发布阶段</div></td>
+    <td><div class="arrow">运维阶段</div></td>
+  </tr>
+
+  <!-- ============ PM ============ -->
+  <tr class="lane-pm">
+    <td class="side" rowspan="4">AI&nbsp;主导交付流程</td>
+    <td class="rolecol" style="background:#f2f2f2">PM</td>
+    <td class="subcol" style="background:#f2f2f2;color:#777">需求方</td>
+    <td class="cell"><div class="band">
+      <div class="act">需求设计</div>
+      <div class="act">需求评审</div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act">需求答疑</div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act">验收确认</div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act">发布计划评审</div>
+    </div></td>
+    <td class="cell vsep"></td>
+  </tr>
+
+  <!-- ============ AI Agent ============ -->
+  <tr class="lane-ai hard">
+    <td class="rolecol" style="background:#dceaf7">AI&nbsp;Agent</td>
+    <td class="subcol" style="background:#dceaf7;color:#14395c">自主执行</td>
+    <td class="cell"><div class="band">
+      <div class="act ai">需求歧义识别</div>
+      <div class="act ai">影响范围推断</div>
+      <div class="act ai">图谱历史缺陷检索</div>
+      <div class="act ai">可测性评估</div>
+      <div class="act ai" style="background:#cfe4fa;border-color:#2f6fa8">业务测试分析<br><span style="font-size:10px">功能点拆解 / 场景枚举</span></div>
+      <div class="act ai" style="background:#cfe4fa;border-color:#2f6fa8">功能用例生成<br><span style="font-size:10px">早于编码 · 作自测靶子</span></div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act ai">技术方案草稿</div>
+      <div class="act ai">代码生成</div>
+      <div class="act ai">代码扫描</div>
+      <div class="act ai">代码评审</div>
+      <div class="act ai">单元测试生成</div>
+      <div class="act ai">变更影响面分析</div>
+      <div class="act ai" style="background:#cfe4fa;border-color:#2f6fa8">接口用例补充<br><span style="font-size:10px">异常分支 / 边界值</span></div>
+      <div class="act ai" style="background:#cfe4fa;border-color:#2f6fa8">回归范围圈定</div>
+      <div class="act ai">自动化脚本生成</div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act ai">风险分级打分</div>
+      <div class="act ai">测试环境准备</div>
+      <div class="act ai">测试执行<br><span style="font-size:10px">（低风险全自动）</span></div>
+      <div class="act ai">失败归因</div>
+      <div class="act ai">缺陷去重与定级建议</div>
+      <div class="act ai">缺陷自动修复<br><span style="font-size:10px">（低风险）</span></div>
+      <div class="act ai">准出报告生成</div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act ai">回滚预案生成</div>
+      <div class="act ai">灰度策略建议</div>
+      <div class="act ai">发布执行</div>
+      <div class="act ai">线上核心链路巡检</div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act ai">告警聚合</div>
+      <div class="act ai">故障根因初判</div>
+      <div class="act ai">缺陷回流图谱</div>
+    </div></td>
+  </tr>
+
+  <!-- ============ 全栈工程师 · 决策类 ============ -->
+  <tr class="lane-gate hard">
+    <td class="rolecol" rowspan="2" style="background:#f7f0dc">全栈工程师</td>
+    <td class="subcol" style="background:#f7f0dc;color:#7b241c">决策类<br><span style="font-weight:400;font-size:10px;color:#999">稳态<br>不可让渡</span></td>
+    <td class="cell"><div class="band">
+      <div class="act gate">需求评审决策</div>
+      <div class="act gate">可测性卡点</div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act gate">技术方案定稿</div>
+      <div class="act gate">AI 代码合入卡点</div>
+      <div class="act gate" style="background:#ffc9c9;border-color:#a93226">用例集一次性审核<br><span style="font-size:10px">功能用例 + 接口用例</span></div>
+      <div class="act gate">边界场景补充</div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act gate">测试准入卡点</div>
+      <div class="act gate">缺陷定级决策</div>
+      <div class="act gate">测试准出卡点</div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act gate">发布放行决策</div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act gate">故障定级与决策</div>
+      <div class="act gate">紧急缺陷验证</div>
+    </div></td>
+  </tr>
+
+  <!-- ============ 全栈工程师 · 执行类 ============ -->
+  <tr class="lane-exec soft">
+    <td class="subcol" style="background:#f0f0f0;color:#666">执行类<br><span style="font-weight:400;font-size:10px;color:#999">过渡态<br>持续压缩</span></td>
+    <td class="cell"></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act fade">复杂逻辑编码</div>
+      <div class="act fade">架构级设计</div>
+      <div class="act">图谱资产维护</div>
+    </div></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act fade">中高风险人工测试</div>
+      <div class="act fade">复杂缺陷修复</div>
+    </div></td>
+    <td class="cell vsep"></td>
+    <td class="cell vsep"><div class="band">
+      <div class="act fade">故障应急处置</div>
+    </div></td>
+  </tr>
+
+</table>
+</div>
+
+<div class="legend">
+  <div class="lg" style="background:#e3f0ff;border-color:#4a86c5;color:#14395c;">蓝色框：AI Agent 自主执行</div>
+  <div class="lg" style="background:#ffd9d9;border-color:#c0392b;color:#7b241c;">红色框：人工决策卡点（责任归属，稳态）</div>
+  <div class="lg" style="background:#fafafa;border:1.2px dashed #c4c4c4;color:#999;">虚线框：人工执行活动（过渡态，将持续被压缩）</div>
+  <div class="lg" style="border-color:#555;">白色框：常态人工活动</div>
+</div>
+
+<div class="note">
+  <p>
+    <b>为什么角色融合后泳道要这样划。</b>
+    原流程按「前端 / 后端 / QA」分泳道，前提是活动归属于工种；工种消失后，唯一仍需在图上表达的归属关系只剩人机分工。因此泳道收敛为 PM（需求方，不参与融合）、AI Agent、全栈工程师三条。
+    但若把原四行简单合并为一行，人的泳道会显得依然拥挤，反而削弱 AI 主导的表达。故在全栈工程师内部做二次切分：<b>决策类</b>是稳态，是人不可让渡的责任边界；<b>执行类</b>是过渡态，随 AI 能力提升将持续压缩至消失。这条分界线本身就是团队未来三年的演进路标。
+  </p>
+  <p>
+    <b>测试活动为何拆到两个阶段。</b>
+    需求阶段与开发阶段做的并非同一件事，故不应二选一，而应拆开。
+    需求阶段做<b>业务级</b>分析——功能点拆解、场景枚举、验收标准提取，输入只有 PRD，需求评审通过即可产出。其价值在于「早」：用例先于代码存在，RD 自测才有靶子，这是自测流程能推动起来的前提；同时用例本身反向校验需求，AI 若写不出用例即说明需求有洞，这正是「可测性卡点」的判定依据。
+    开发阶段做<b>技术级</b>补充——接口用例、异常分支、边界值、回归范围圈定，必须等技术方案定稿乃至代码提交后才有输入，因为实现方式、下游改动、新增失败路径在需求阶段无从得知。这部分需求阶段做不了。
+  </p>
+  <p>
+    <b>三处关键变化。</b>
+    其一，<b>AI 泳道吃掉了开发阶段的执行主体</b>：代码生成、扫描、评审、单元测试、自动化脚本全部内聚，人只在「AI 代码合入卡点」处介入。
+    其二，<b>QA 的卡点没有消失，只是换了人执行</b>：测试准入、缺陷定级、测试准出三个红框依然存在，由全栈工程师承担——融合的是角色，不是质量门禁。
+    其三，<b>发布执行也交给了 AI</b>：人只保留放行决策。这是原流程中 RD 泳道最后一项常规执行活动的消失。
+  </p>
+  <p style="background:#fff8e6;border-left:3px solid #e0a800;padding:10px 14px;">
+    <b>需注意：用例审核延后带来的返工风险。</b>
+    本图采用「一次性审核」方案，即需求阶段 AI 生成的功能用例<b>未经人工审核即流入开发阶段</b>，RD 直接以其为自测靶子。若 AI 用例存在偏差，RD 按错误靶子完成自测，要到开发阶段审核时才暴露，返工成本高于在需求阶段拦截。
+    此方案的收益是卡点少、流程轻，适用于 AI 用例质量已稳定的团队。建议以两项措施对冲：一是监控功能用例的审核通过率，若持续低于阈值则将卡点前移至需求阶段；二是需求阶段产出用例后同步推送 PM 快速确认业务场景无遗漏，以低成本方式替代正式评审。
+  </p>
+  <p>
+    <b>角色融合带来的新风险，需在落地规范中单列。</b>
+    原流程中 QA 与 RD 分离，天然构成交叉校验；融合后同一个人既写代码又做准出决策，<b>自己验自己</b>的问题会显现。建议以两种机制对冲：一是高风险需求强制「交叉卡点」，由非本需求负责人执行准出；二是把 AI 准出报告设为不可绕过的客观依据，卡点决策必须基于报告结论留痕。缺少这两条，融合会以质量下滑的形式反噬。
+  </p>
+</div>
+
+</body>
+</html>
